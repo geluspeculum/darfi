@@ -972,8 +972,8 @@ def find_cell_coords(nucleus):
     x_sum = np.sum(nucleus,1).astype(bool)
     y_sum = np.sum(nucleus,0).astype(bool)
 
-    x_ind = np.transpose(x_sum.nonzero())
-    y_ind = np.transpose(y_sum.nonzero())
+    x_ind = np.flatnonzero(x_sum)
+    y_ind = np.flatnonzero(y_sum)
 
     left  = x_ind[0]
     right = x_ind[-1] + 1

@@ -29,7 +29,7 @@ from scipy.misc import imsave
 from skimage import img_as_ubyte
 from skimage import img_as_float
 from skimage.draw import circle_perimeter, circle
-from skimage.filters import gaussian_filter
+from skimage.filters import gaussian
 from skimage.feature import canny as canny_filter
 #from skimage.filters import threshold_adaptive
 from skimage.filters import threshold_otsu as global_otsu
@@ -120,8 +120,8 @@ def foci_plm(foci_pic, nucleus, peak_min_val_perc = 60, foci_min_val_perc = 90, 
 def get_markers(foci_pic, nucleus, peak_min_val_perc = 60):
     '''Return foci markers'''
 
-#    foci_pic_blured = img_as_ubyte(gaussian_filter(foci_pic, 1))
-    foci_pic_blured = np.floor(gaussian_filter(foci_pic, 3)*255).astype(np.uint8)
+#    foci_pic_blured = img_as_ubyte(gaussian(foci_pic, 1))
+    foci_pic_blured = np.floor(gaussian(foci_pic, 3)*255).astype(np.uint8)
 
     foci_values = np.extract(nucleus, foci_pic)
 
@@ -229,6 +229,9 @@ def get_foci_bin(blobs, foci_pic, nucleus, margin = 1, foci_val_perc = 10):
 
         x_m, y_m, r = blob
 
+        x_m = np.round(x_m).astype(int)
+        y_m = np.round(y_m).astype(int)
+
 #        foci_radius_s = np.round(r*np.sqrt(2)).astype(int)
         foci_radius_s = np.round(r*2).astype(int)
         foci_radius_l = foci_radius_s + margin
@@ -301,7 +304,7 @@ def circle_markers(blobs, pic_shape):
 
         r = r*np.sqrt(2)
 
-        rr, cc = circle_perimeter(x, y, np.round(r).astype(int))
+        rr, cc = circle_perimeter(np.round(x).astype(int), np.round(y).astype(int), np.round(r).astype(int))
         rr_new, cc_new = [], []
 
         for x_c,y_c in zip(rr,cc):
@@ -421,7 +424,7 @@ def sharpen_image(pic_source):
     koef = 0.8
 
     image = img_as_float(pic_source)
-    blurred = gaussian_filter(image, blur_size)
+    blurred = gaussian(image, blur_size)
     highpass = image - koef * blurred
     sharp = image + highpass
 
@@ -487,8 +490,8 @@ def split_label(binary):
 #    print blur_radius
 
     distance = distance_transform_edt(binary)
-#    distance_blured = gaussian_filter(distance, blur_radius)
-    distance_blured = gaussian_filter(distance, 8)
+#    distance_blured = gaussian(distance, blur_radius)
+    distance_blured = gaussian(distance, 8)
 
 #    selem = disk(2)
 
@@ -524,7 +527,7 @@ def split_label(binary):
 
 #    selem = np.ones((3,3), dtype = bool)
 
-#    distance_blured = gaussian_filter(distance, 5)
+#    distance_blured = gaussian(distance, 5)
 
 #    local_maxi = peak_local_max(distance_blured, footprint=selem, indices=False, labels=binary, min_distance = 30)
 
