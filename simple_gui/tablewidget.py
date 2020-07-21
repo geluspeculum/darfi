@@ -4,22 +4,22 @@ Created on Fri Dec 19 22:57:17 2014
 
 @author: satary
 """
-from PyQt4 import QtGui,QtCore
+from PyQt5 import QtWidgets, QtCore
 import sys, csv, xlsxwriter
-class TableWidget(QtGui.QTableWidget):
+class TableWidget(QtWidgets.QTableWidget):
     def __init__(self,parent=None):
         super(TableWidget, self).__init__(parent)
         self.parent=parent
-        #self.table = QtGui.QTableWidget()
-        self.clip = QtGui.QApplication.clipboard()
-        #self.mainLayout = QtGui.QVBoxLayout(self)
+        #self.table = QtWidgets.QTableWidget()
+        self.clip = QtWidgets.QApplication.clipboard()
+        #self.mainLayout = QtWidgets.QVBoxLayout(self)
         #self.mainLayout.addWidget(self.table)
-        self.horizontalHeader().setMovable(True)
-        self.verticalHeader().setMovable(True)
+        self.horizontalHeader().setSectionsMovable(True)
+        self.verticalHeader().setSectionsMovable(True)
         self.horizontalHeader().setDefaultSectionSize(60)
         self.setMinimumWidth(237)
         self.setMinimumHeight(260)
-        self.setSizePolicy(QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Minimum)
+        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding,QtWidgets.QSizePolicy.Minimum)
 
 
         self.rowOrder=[]
@@ -72,18 +72,18 @@ class TableWidget(QtGui.QTableWidget):
             #if row in inDict:
             rows.append(row)
             self.insertRow(self.rowCount())
-            self.setVerticalHeaderItem(self.rowCount()-1, QtGui.QTableWidgetItem(row))
+            self.setVerticalHeaderItem(self.rowCount()-1, QtWidgets.QTableWidgetItem(row))
             for col in visibleCols:
                 #if (col in inDict[row]):
                 if (not(col in columns)):
                     columns.append(col)
                     self.insertColumn(self.columnCount())
-                    self.setHorizontalHeaderItem(self.columnCount()-1,QtGui.QTableWidgetItem(col))
+                    self.setHorizontalHeaderItem(self.columnCount()-1,QtWidgets.QTableWidgetItem(col))
         #asidning values
         for row in rows:
             for col in columns:
                 try:
-                    item=QtGui.QTableWidgetItem(str(inDict[row][col]))
+                    item=QtWidgets.QTableWidgetItem(str(inDict[row][col]))
                     item.setFlags(QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled)
                     self.setItem(rows.index(row),columns.index(col),item)
                 except:
@@ -128,61 +128,61 @@ class TableWidget(QtGui.QTableWidget):
                 self.copySelectionToClipboard()
 
     def contextMenuEvent(self, pos):
-        menu = QtGui.QMenu()
+        menu = QtWidgets.QMenu()
         copyAction = menu.addAction("Copy")
-        action = menu.exec_(QtGui.QCursor.pos())
+        action = menu.exec_(QtWidgets.QCursor.pos())
         if action == copyAction:
             self.copySelectionToClipboard()
 
     def handleSaveCSV(self,path):
-        rowLog = range(self.rowCount())
+        rowLog = list(range(self.rowCount()))
         rowIndx = [self.visualRow(i) for i in rowLog]
         rowVis = [x for (y,x) in sorted(zip(rowIndx,rowLog))]
 
-        colLog = range(self.columnCount())
+        colLog = list(range(self.columnCount()))
         colIndx = [self.visualColumn(i) for i in colLog]
         colVis = [x for (y,x) in sorted(zip(colIndx,colLog))]
 
 
-        with open(unicode(path), 'wb') as stream:
+        with open(str(path), 'wb') as stream:
             writer = csv.writer(stream)
             rowdata = []
             rowdata.append("")
             for column in colVis:
-                rowdata.append(unicode(self.horizontalHeaderItem(column).text()).encode('utf8'))
+                rowdata.append(str(self.horizontalHeaderItem(column).text()).encode('utf8'))
             writer.writerow(rowdata)
             for row in rowVis:
 
                 rowdata = []
-                rowdata.append(unicode(self.verticalHeaderItem(row).text()).encode('utf8'))
+                rowdata.append(str(self.verticalHeaderItem(row).text()).encode('utf8'))
                 for column in colVis:
 
                     item = self.item(row, column)
                     if item is not None:
                         rowdata.append(
-                            unicode(item.text()).encode('utf8'))
+                            str(item.text()).encode('utf8'))
                     else:
                         rowdata.append('')
                 writer.writerow(rowdata)
 
 
     def handleSaveXLSX(self,path):
-        rowLog = range(self.rowCount())
+        rowLog = list(range(self.rowCount()))
         rowIndx = [self.visualRow(i) for i in rowLog]
         rowVis = [x for (y,x) in sorted(zip(rowIndx,rowLog))]
 
-        colLog = range(self.columnCount())
+        colLog = list(range(self.columnCount()))
         colIndx = [self.visualColumn(i) for i in colLog]
         colVis = [x for (y,x) in sorted(zip(colIndx,colLog))]
 
 #        path = unicode(path).encode('utf8')
-        path = unicode(path)
+        path = str(path)
         wb = xlsxwriter.Workbook(path)
         ws = wb.add_worksheet('DARFI results')
         rowdata = []
         rowdata.append("")
         for column in colVis:
-            rowdata.append(unicode(self.horizontalHeaderItem(column).text()).encode('utf8'))
+            rowdata.append(str(self.horizontalHeaderItem(column).text()).encode('utf8'))
         for i,text_item in enumerate(rowdata):
             ws.write(0,i,text_item)
 
@@ -190,13 +190,13 @@ class TableWidget(QtGui.QTableWidget):
 
             rownum = j+1
             rowdata = []
-            rowdata.append(unicode(self.verticalHeaderItem(row).text()).encode('utf8'))
+            rowdata.append(str(self.verticalHeaderItem(row).text()).encode('utf8'))
             for column in colVis:
 
                 item = self.item(row, column)
                 if item is not None:
                     rowdata.append(
-                        unicode(item.text()).encode('utf8'))
+                        str(item.text()).encode('utf8'))
                 else:
                     rowdata.append('')
             for i, text_item in enumerate(rowdata):
@@ -211,8 +211,8 @@ class TableWidget(QtGui.QTableWidget):
     def copySelectionToClipboard(self):
         selected = self.selectedRanges()
         s = ""
-        for r in xrange(selected[0].topRow(),selected[0].bottomRow()+1):
-            for c in xrange(selected[0].leftColumn(),selected[0].rightColumn()+1):
+        for r in range(selected[0].topRow(),selected[0].bottomRow()+1):
+            for c in range(selected[0].leftColumn(),selected[0].rightColumn()+1):
                 try:
                     s += str(self.item(r,c).text()) + "\t"
                 except AttributeError:
@@ -222,7 +222,7 @@ class TableWidget(QtGui.QTableWidget):
 
 def main():
 
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     ex = TableWidget()
     ex.show()
     sys.exit(app.exec_())

@@ -23,7 +23,7 @@ import folder_widget
 import settings_window
 from settings import Settings
 from tablewidget import TableWidget
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 
 
 #### Uncomment these lines if building py2exe binary with window output only
@@ -36,7 +36,7 @@ except AttributeError:
     _fromUtf8 = lambda s: s
 
 
-class CusLabel(QtGui.QLabel):
+class CusLabel(QtWidgets.QLabel):
     def __init__(self, parent, key=None):
         super(CusLabel, self).__init__(parent)
         self.parent=parent
@@ -65,12 +65,12 @@ class CusLabel(QtGui.QLabel):
 
 
 
-class DarfiUI(QtGui.QMainWindow):
+class DarfiUI(QtWidgets.QMainWindow):
 
     def __init__(self):
         super(DarfiUI, self).__init__()
         self.settings=Settings()
-        self.workDir=unicode(QtCore.QDir.currentPath())
+        self.workDir=str(QtCore.QDir.currentPath())
         self.showMiniatures=True
         self.oldDirsWithImages=[]
         self.oldFoci_rescale_min = None
@@ -78,8 +78,8 @@ class DarfiUI(QtGui.QMainWindow):
         self.lastCalc=False
         self.settingsChanged=True
         self.initUI()
-        if os.path.isfile(os.path.join(unicode(QtCore.QDir.currentPath()),"Darfi_session.dcf")):
-            self.readSettings(os.path.join(unicode(QtCore.QDir.currentPath()),"Darfi_session.dcf"))
+        if os.path.isfile(os.path.join(str(QtCore.QDir.currentPath()),"Darfi_session.dcf")):
+            self.readSettings(os.path.join(str(QtCore.QDir.currentPath()),"Darfi_session.dcf"))
 
 
     def loadDefaultSettings(self):
@@ -87,30 +87,30 @@ class DarfiUI(QtGui.QMainWindow):
         self.settings.foci_name=self.fociNameComboBox.currentText()
         self.settings.nuclei_name=self.nuclNameComboBox.currentText()
         self.fileMenuArea.setWorkDir(self.workDir)
-        print "Default settings loaded"
+        print("Default settings loaded")
 
 
 
     def dumpSettings(self,filename=None):
         if not(filename):
-            filename=unicode(QtGui.QFileDialog.getSaveFileName(self,'Write DARFI config file', '','DARFI Config File, *.dcf;;All Files (*)'))
+            filename=str(QtWidgets.QFileDialog.getSaveFileName(self,'Write DARFI config file', '','DARFI Config File, *.dcf;;All Files (*)'))
         if ((filename != "") & (self.settings.nuclei_name!='')):
 
             #that is rude but it works (
             if filename[-4:] != '.dcf':
-                filename+=unicode('.dcf')
+                filename+=str('.dcf')
             with open(filename, 'w+') as f:
                 #self.tableWidget.getOrders()
-                print self.settings.rowOrder
-                print self.settings.columnOrder
+                print(self.settings.rowOrder)
+                print(self.settings.columnOrder)
                 pickle.dump([self.fileMenuArea.workDir,self.settings,self.fileMenuArea.getCheckedPaths()], f)
 
     def readSettings(self,filename=None):
         if not(filename):
-            filename=unicode(QtGui.QFileDialog.getOpenFileName(self,'Open DARFI config file', '','DARFI Config File, *.dcf;;All Files (*)'))
+            filename=str(QtWidgets.QFileDialog.getOpenFileName(self,'Open DARFI config file', '','DARFI Config File, *.dcf;;All Files (*)'))
         if filename != "":
             with open(filename) as f:
-                print "Loading previous config"
+                print("Loading previous config")
                 try:
                     self.workDir,self.settings, paths = pickle.load(f)
                     self.fileMenuArea.openWorkDir(self.workDir)
@@ -120,7 +120,7 @@ class DarfiUI(QtGui.QMainWindow):
                     else:
                         self.rescaleButton.setEnabled(True)
                 except ValueError:
-                    print "Save file is corrupted or incompatible \n Loading default"
+                    print("Save file is corrupted or incompatible \n Loading default")
 
 
     def openSettings(self):
@@ -129,8 +129,8 @@ class DarfiUI(QtGui.QMainWindow):
         self.settings,self.settingsChanged = self.settingsWindow.getSettings()
 
     def closeEvent(self, event):
-        print "Closing DARFI, goodbye"
-        filename=os.path.join(unicode(QtCore.QDir.currentPath()),"Darfi_session.dcf")
+        print("Closing DARFI, goodbye")
+        filename=os.path.join(str(QtCore.QDir.currentPath()),"Darfi_session.dcf")
         self.dumpSettings(filename)
 
 
@@ -140,11 +140,11 @@ class DarfiUI(QtGui.QMainWindow):
 
 
     def setNuclei_name(self,text):
-        self.settings.nuclei_name = unicode(text)
+        self.settings.nuclei_name = str(text)
         self.fileMenuArea.openWorkDir(self.workDir)
 
     def setFoci_name(self,text=None):
-        self.settings.foci_name = unicode(text)
+        self.settings.foci_name = str(text)
         self.fileMenuArea.changeFociImages()
         if self.settings.foci_name=='--None--':
             self.rescaleButton.setEnabled(False)
@@ -181,12 +181,12 @@ class DarfiUI(QtGui.QMainWindow):
 
         else:
             self.showMiniatures = False
-            self.fileMenuArea.selectedImage = unicode(self.fileMenuArea.selectedImageDir.absolutePath() + QtCore.QDir.separator() + self.imageNameList[key])
+            self.fileMenuArea.selectedImage = str(self.fileMenuArea.selectedImageDir.absolutePath() + QtCore.QDir.separator() + self.imageNameList[key])
             self.updateImages()
 
     def saveParams(self):
 
-        filename=QtGui.QFileDialog.getSaveFileName(self,'Save results of latest calculation'
+        filename=QtWidgets.QFileDialog.getSaveFileName(self,'Save results of latest calculation'
             , self.workDir + str(os.sep) + \
             'result.xlsx','Microsoft Excel file, *.xlsx;;CSV File, *.csv;;All Files (*)')
         if not filename.isEmpty():
@@ -196,9 +196,9 @@ class DarfiUI(QtGui.QMainWindow):
                     self.tableWidget.handleSaveXLSX(filename)
                 else:
                     self.tableWidget.handleSaveCSV (filename)
-                print "File saved!"
+                print("File saved!")
             except:
-                print "Error file saving!"
+                print("Error file saving!")
 
     def updateImages(self):
         if self.showMiniatures:
@@ -307,10 +307,10 @@ class DarfiUI(QtGui.QMainWindow):
 
 ################## IMAGE AREA  ########################################
 
-        self.imagePreviewArea = QtGui.QScrollArea(self)
+        self.imagePreviewArea = QtWidgets.QScrollArea(self)
 
-        self.imagePreviewLayout = QtGui.QGridLayout(self.imagePreviewArea)
-        self.connect(self.imagePreviewArea, QtCore.SIGNAL("resizeEvent()"), self.updateImages)
+        self.imagePreviewLayout = QtWidgets.QGridLayout(self.imagePreviewArea)
+        self.imagePreviewArea.resizeEvent = lambda foo: self.updateImages()
         self.lbl1 = CusLabel(self,0)
         self.imagePreviewLayout.addWidget(self.lbl1, 0,0)
         self.lbl2 = CusLabel(self,1)
@@ -326,28 +326,28 @@ class DarfiUI(QtGui.QMainWindow):
 
 ################## SETTINGS AREA  ########################################
 
-        buttonArea = QtGui.QWidget(self)
-        buttonLayout = QtGui.QVBoxLayout(buttonArea)
+        buttonArea = QtWidgets.QWidget(self)
+        buttonLayout = QtWidgets.QVBoxLayout(buttonArea)
 
-        self.openSettingsButton = QtGui.QPushButton("Settings")
+        self.openSettingsButton = QtWidgets.QPushButton("Settings")
         self.openSettingsButton.clicked.connect(self.openSettings)
         buttonLayout.addWidget(self.openSettingsButton)
-        self.pbar = QtGui.QProgressBar(self)
+        self.pbar = QtWidgets.QProgressBar(self)
 
 
 
 
 
-        nuclNameFieldLabel = QtGui.QLabel(self)
+        nuclNameFieldLabel = QtWidgets.QLabel(self)
         nuclNameFieldLabel.setText("Files with nuclei:")
-        self.nuclNameComboBox = QtGui.QComboBox(self)
+        self.nuclNameComboBox = QtWidgets.QComboBox(self)
         self.nuclNameComboBox.activated[str].connect(self.setNuclei_name)
         buttonLayout.addWidget(nuclNameFieldLabel)
         buttonLayout.addWidget(self.nuclNameComboBox)
 
-        fociNameFieldLabel = QtGui.QLabel(self)
+        fociNameFieldLabel = QtWidgets.QLabel(self)
         fociNameFieldLabel.setText("Files with foci:")
-        self.fociNameComboBox = QtGui.QComboBox(self)
+        self.fociNameComboBox = QtWidgets.QComboBox(self)
         self.fociNameComboBox.addItem('--None--')
         self.fociNameComboBox.activated[str].connect(self.setFoci_name)
 
@@ -357,11 +357,11 @@ class DarfiUI(QtGui.QMainWindow):
 
 
 
-        self.rescaleButton = QtGui.QPushButton("Get scale from selection")
+        self.rescaleButton = QtWidgets.QPushButton("Get scale from selection")
         self.rescaleButton.clicked.connect(self.fileMenuArea.getScaleFromSelected)
         buttonLayout.addWidget(self.rescaleButton)
 
-        runCalcButton = QtGui.QPushButton("Calculate")
+        runCalcButton = QtWidgets.QPushButton("Calculate")
         runCalcButton.clicked.connect(self.fileMenuArea.calculateSelected)
         runCalcButton.setMinimumHeight(40)
         buttonLayout.addWidget(runCalcButton)
@@ -371,39 +371,39 @@ class DarfiUI(QtGui.QMainWindow):
         self.pbar.hide()
         buttonLayout.addWidget(self.pbar)
 
-        #spacer=QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Minimum)
+        #spacer=QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
 
         #buttonLayout.addSpacerItem(spacer)
 
         self.tableWidget=TableWidget(self)
 
-        tabs = QtGui.QTabWidget(self)
+        tabs = QtWidgets.QTabWidget(self)
         #_______________________________________
         #buttonLayout.addWidget(self.tableWidget)
 
-        tab1=QtGui.QWidget()
-        tab1Layout=QtGui.QVBoxLayout(tab1)
+        tab1=QtWidgets.QWidget()
+        tab1Layout=QtWidgets.QVBoxLayout(tab1)
         tabs.addTab(tab1,"Results")
         tab1Layout.addWidget(self.tableWidget)
 
 
 
-        self.outfileButton = QtGui.QPushButton("Save results")
+        self.outfileButton = QtWidgets.QPushButton("Save results")
         self.outfileButton.clicked.connect(self.saveParams)
         self.outfileButton.setEnabled(False)
         tab1Layout.addWidget(self.outfileButton)
 
-        self.singleCellOutputBox = QtGui.QCheckBox('Single cell output', self)
+        self.singleCellOutputBox = QtWidgets.QCheckBox('Single cell output', self)
         self.singleCellOutputBox.setEnabled(False)
         self.singleCellOutputBox.stateChanged.connect(self.fileMenuArea.updateParamsTable)
         tab1Layout.addWidget(self.singleCellOutputBox)
 
 
 
-        nuclLogLabel = QtGui.QLabel(self)
+        nuclLogLabel = QtWidgets.QLabel(self)
 
 
-        self.logText = QtGui.QTextEdit()
+        self.logText = QtWidgets.QTextEdit()
         #self.logText.setMaximumHeight(130)
         self.logText.setReadOnly(True)
         self.logText.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
@@ -443,23 +443,23 @@ class DarfiUI(QtGui.QMainWindow):
         else:
             icon.addPixmap(QtGui.QPixmap(_fromUtf8(os.path.join(os.getcwd(), 'misc', 'darfi.ico'))), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 
-        hbox = QtGui.QHBoxLayout()
+        hbox = QtWidgets.QHBoxLayout()
 
-        splitter1 = QtGui.QSplitter(QtCore.Qt.Horizontal)
+        splitter1 = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
         splitter1.addWidget(self.imagePreviewArea)
         splitter1.addWidget(buttonArea)
         splitter1.setSizes([windowInitWidth-480,240])
         splitter1.splitterMoved.connect(self.updateImages)
 
         '''
-        splitter2 = QtGui.QSplitter(QtCore.Qt.Vertical)
+        splitter2 = QtWidgets.QSplitter(QtCore.Qt.Vertical)
         splitter2.addWidget(splitter1)
         splitter2.addWidget(self.statusArea)
         splitter2.setSizes([windowInitHeight-200,windowInitHeight/200])
         splitter2.splitterMoved.connect(self.updateImages)
         '''
 
-        splitter3 = QtGui.QSplitter(QtCore.Qt.Horizontal)
+        splitter3 = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
         splitter3.addWidget(self.fileMenuArea)
         splitter3.addWidget(splitter1)
         splitter3.setSizes([240,windowInitWidth-240])
@@ -467,7 +467,7 @@ class DarfiUI(QtGui.QMainWindow):
 
         hbox.addWidget(splitter3)
 
-        hboxWidget=QtGui.QWidget(self)
+        hboxWidget=QtWidgets.QWidget(self)
         hboxWidget.setLayout(hbox)
         self.setCentralWidget(hboxWidget)
 
@@ -481,22 +481,22 @@ class DarfiUI(QtGui.QMainWindow):
     ################## MAIN MENU AREA  ########################################
 
     def createActions(self):
-        self.settingsAct = QtGui.QAction("&Settings...", self, shortcut="Ctrl+S",triggered=self.openSettings)
+        self.settingsAct = QtWidgets.QAction("&Settings...", self, shortcut="Ctrl+S",triggered=self.openSettings)
 
-        self.settingsDefAct = QtGui.QAction("&Load Defaults...", self, shortcut="Ctrl+D",triggered=self.loadDefaultSettings)
+        self.settingsDefAct = QtWidgets.QAction("&Load Defaults...", self, shortcut="Ctrl+D",triggered=self.loadDefaultSettings)
 
-        self.openSettingsAct = QtGui.QAction("&Load settings...", self, shortcut="Ctrl+R",triggered=self.readSettings)
+        self.openSettingsAct = QtWidgets.QAction("&Load settings...", self, shortcut="Ctrl+R",triggered=self.readSettings)
 
-        self.saveSettingsAct = QtGui.QAction("&Write settings...", self, shortcut="Ctrl+W",triggered=self.dumpSettings)
+        self.saveSettingsAct = QtWidgets.QAction("&Write settings...", self, shortcut="Ctrl+W",triggered=self.dumpSettings)
 
-        self.exitAct = QtGui.QAction("E&xit", self, shortcut="Ctrl+Q",triggered=self.close)
+        self.exitAct = QtWidgets.QAction("E&xit", self, shortcut="Ctrl+Q",triggered=self.close)
 
-        self.aboutAct = QtGui.QAction("&About", self, triggered=self.about)
+        self.aboutAct = QtWidgets.QAction("&About", self, triggered=self.about)
 
-        self.aboutQtAct = QtGui.QAction("About &Qt", self,triggered=QtGui.qApp.aboutQt)
+        self.aboutQtAct = QtWidgets.QAction("About &Qt", self,triggered=QtWidgets.qApp.aboutQt)
 
     def createMenus(self):
-        self.fileMenu = QtGui.QMenu("&File", self)
+        self.fileMenu = QtWidgets.QMenu("&File", self)
         self.fileMenu.addAction(self.settingsAct)
         self.fileMenu.addAction(self.settingsDefAct)
         self.fileMenu.addSeparator()
@@ -505,7 +505,7 @@ class DarfiUI(QtGui.QMainWindow):
         self.fileMenu.addSeparator()
         self.fileMenu.addAction(self.exitAct)
 
-        self.helpMenu = QtGui.QMenu("&About", self)
+        self.helpMenu = QtWidgets.QMenu("&About", self)
         self.helpMenu.addAction(self.aboutAct)
         self.helpMenu.addAction(self.aboutQtAct)
 
@@ -513,7 +513,7 @@ class DarfiUI(QtGui.QMainWindow):
         self.menuBar().addMenu(self.helpMenu)
 
     def about(self):
-        QtGui.QMessageBox.about(self, "About DARFI",
+        QtWidgets.QMessageBox.about(self, "About DARFI",
                 "<p><b>DARFI</b> is short of dna Damage And Repair Foci Imager <br>"
                 "Copyright (C) 2014  Ivan V. Ozerov<br>"
                 "This program is free software; you can redistribute it and/or modify "
@@ -529,13 +529,13 @@ class Logger(object):
 
     def write(self, string):
         if not (string == "\n" ):
-            trstring = QtGui.QApplication.translate("MainWindow", string.rstrip(), None, QtGui.QApplication.UnicodeUTF8)
+            trstring = QtWidgets.QApplication.translate("MainWindow", string.rstrip(), None)
             self.output.append(trstring)
 
 
 def main():
 
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     ex = DarfiUI()
     ex.showMaximized()
     sys.exit(app.exec_())

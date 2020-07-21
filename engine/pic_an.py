@@ -136,7 +136,7 @@ class cell:
 class cell_set:
     '''Class representing set of cells'''
 
-    def __init__(self, name = u'', cells = []):
+    def __init__(self, name = '', cells = []):
         '''Construct set from the list of cells given'''
 
         self.cells = cells
@@ -415,7 +415,7 @@ class cell_set:
         cell_num = len(self.cells)
         if cell_num != 0:
             zero_num = np.floor(np.log(cell_num)/np.log(10)).astype(int) + 1
-        for cur_cell,cur_num in zip(self.cells,range(cell_num)):
+        for cur_cell,cur_num in zip(self.cells,list(range(cell_num))):
 
 #            if not cur_cell.is_active: continue
 
@@ -477,7 +477,7 @@ class cell_set:
 
         cell_params = self.cell_params
 
-        param_names = cell_params.keys()
+        param_names = list(cell_params.keys())
 
         cell_names = self.cell_names
 
@@ -734,7 +734,7 @@ class image_dir(cell_set):
 
         colored_nuclei_peaces = []
 
-        for cur_cell, cur_num in zip(self.cells, range(cell_number)):
+        for cur_cell, cur_num in zip(self.cells, list(range(cell_number))):
 
             if not cur_cell.is_active: continue
 
@@ -852,7 +852,7 @@ class image_dir(cell_set):
     def write_pic_with_nuclei_colored(self, pic_nuclei_colored = None):
         '''Write pic with colored nuclei to a file'''
 
-        pic_nuclei_colored_path = os.path.join(self.dir_path, u'colored_nuclei.jpg')
+        pic_nuclei_colored_path = os.path.join(self.dir_path, 'colored_nuclei.jpg')
 
         if (pic_nuclei_colored == None):
             pic_nuclei_colored = self.get_pic_with_nuclei_colored()
@@ -870,10 +870,10 @@ class image_dir(cell_set):
             self.write_pic_with_nuclei_colored()
             return
 
-        pic_colored_nuclei_path = os.path.join(self.dir_path,u'colored_nuclei.jpg')
-        pic_merged_path         = os.path.join(self.dir_path,u'merged.jpg')
-        pic_seeds_path          = os.path.join(self.dir_path,u'seeds_foci.jpg')
-        pic_rescaled_foci_path  = os.path.join(self.dir_path,u'rescaled_foci.jpg')
+        pic_colored_nuclei_path = os.path.join(self.dir_path,'colored_nuclei.jpg')
+        pic_merged_path         = os.path.join(self.dir_path,'merged.jpg')
+        pic_seeds_path          = os.path.join(self.dir_path,'seeds_foci.jpg')
+        pic_rescaled_foci_path  = os.path.join(self.dir_path,'rescaled_foci.jpg')
 
         rescaled_nuclei_pic, nuclei_colored, rescaled_foci_pic, seeds, merged = \
                 self.get_all_pics(nuclei_color, foci_color)

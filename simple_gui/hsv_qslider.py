@@ -12,9 +12,9 @@
 # GNU General Public License v2 for more details.
 
 import sys
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 
-class slider(QtGui.QWidget):
+class slider(QtWidgets.QWidget):
     
     def __init__(self):
         super(slider, self).__init__()
@@ -80,12 +80,12 @@ border-radius: 4px;
 }
 
 """
-        self.sld = QtGui.QSlider(QtCore.Qt.Horizontal, self)
+        self.sld = QtWidgets.QSlider(QtCore.Qt.Horizontal, self)
 
         self.sld.setStyleSheet(style)
         self.sld.setGeometry(0, 0, 190, 20)
         self.sld.setFixedSize(190,16)
-        self.sld.setSizePolicy(QtGui.QSizePolicy.Expanding,QtGui.QSizePolicy.Expanding)
+        self.sld.setSizePolicy(QtWidgets.QSizePolicy.Expanding,QtWidgets.QSizePolicy.Expanding)
        
         
         #self.show()

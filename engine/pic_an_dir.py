@@ -21,7 +21,7 @@
 import os
 import pic_an
 
-def calc_multiple_dirs(dir_path, nuclei_name=u'3DAPI.TIF', foci_name=u'3FITС.TIF'):
+def calc_multiple_dirs(dir_path, nuclei_name='3DAPI.TIF', foci_name='3FITС.TIF'):
     '''Separately calculates foci for all subdirs'''
 
     subdirs = [os.path.join(dir_path, directory) for directory in os.listdir(dir_path) \
@@ -29,13 +29,13 @@ def calc_multiple_dirs(dir_path, nuclei_name=u'3DAPI.TIF', foci_name=u'3FITС.TI
 
     for subdir in subdirs:
 
-        print 'Calculation has STARTED in', os.path.split(subdir)[0]
+        print('Calculation has STARTED in', os.path.split(subdir)[0])
 
         calc_foci_in_dir(subdir, nuclei_name, foci_name)
 
-        print 'Calculation has FINISHED in', os.path.split(subdir)[0]
+        print('Calculation has FINISHED in', os.path.split(subdir)[0])
 
-def calc_foci_in_dir(dir_path, nuclei_name=u'3DAPI.TIF', foci_name=u'3FITС.TIF', outfile = u'result.txt',\
+def calc_foci_in_dir(dir_path, nuclei_name='3DAPI.TIF', foci_name='3FITС.TIF', outfile = 'result.txt',\
         sensitivity = 4., min_cell_size = 4000, peak_min_val_perc = 60, foci_min_val_perc = 90,\
         foci_radius = 10, foci_min_level_on_bg = 40, foci_rescale_min = None, foci_rescale_max = None,\
         nuclei_color = 0.66, foci_color = 0.33):
@@ -49,7 +49,7 @@ def calc_foci_in_dir(dir_path, nuclei_name=u'3DAPI.TIF', foci_name=u'3FITС.TIF'
         nuclei_color, foci_color)
 
 #THE lasiest way to do the job =D
-def calc_foci_in_dirlist(dir_path, dir_list, nuclei_name=u'3DAPI.TIF', foci_name=u'3FITС.TIF', outfile = u'result.txt',\
+def calc_foci_in_dirlist(dir_path, dir_list, nuclei_name='3DAPI.TIF', foci_name='3FITС.TIF', outfile = 'result.txt',\
         sensitivity = 8., min_cell_size = 1500, peak_min_val_perc = 60, foci_min_val_perc = 90,\
         foci_radius = 10, foci_min_level_on_bg = 40, foci_rescale_min = None, foci_rescale_max = None,\
         nuclei_color = 0.66, foci_color = 0.33):
@@ -64,17 +64,17 @@ def calc_foci_in_dirlist(dir_path, dir_list, nuclei_name=u'3DAPI.TIF', foci_name
 
     path1,name2 = os.path.split(dir_path)
     name1       = os.path.split(path1)[1]
-    print name1, name2, path1
+    print(name1, name2, path1)
     name = name1 + '_' + name2
     absoutfile = os.path.join(dir_path,outfile)
-    print name
+    print(name)
     cell_set = pic_an.cell_set(name=name, cells=[])
 
     remained = len(image_dirs)
 
-    print "We have", remained, 'images to load for', name
+    print("We have", remained, 'images to load for', name)
 
-    print "Image loading have started for", name
+    print("Image loading have started for", name)
 
     for image_dir in image_dirs:
         image_dir.load_separate_images(sensitivity, min_cell_size)
@@ -82,9 +82,9 @@ def calc_foci_in_dirlist(dir_path, dir_list, nuclei_name=u'3DAPI.TIF', foci_name
         remained -= 1
 
         if remained == 0:
-            print "Image loading have finished for", name
+            print("Image loading have finished for", name)
         else:
-            print remained, 'images remained to load for', name
+            print(remained, 'images remained to load for', name)
 
         image_dir.write_pic_with_nuclei_colored()
 

@@ -1,11 +1,11 @@
 import sys, os
 sys.path.append(os.path.join('..','engine'))
 import pic_an
-from PyQt4 import QtGui,QtCore
+from PyQt5 import QtWidgets, QtCore
 '''
 This widget implements folders and pictures
 '''
-class FolderWidget(QtGui.QWidget):
+class FolderWidget(QtWidgets.QWidget):
     def __init__(self,parent):
         super(FolderWidget, self).__init__(parent)
         self.parent=parent
@@ -16,19 +16,19 @@ class FolderWidget(QtGui.QWidget):
         
 
        
-        self.foldersScrollArea = QtGui.QScrollArea(self)
+        self.foldersScrollArea = QtWidgets.QScrollArea(self)
         self.foldersScrollArea.setWidgetResizable(True)
         
-        self.foldersScrollAreaWidget = QtGui.QWidget()
+        self.foldersScrollAreaWidget = QtWidgets.QWidget()
         self.foldersScrollAreaWidget.setGeometry(QtCore.QRect(0, 0, 380, 280))
-        self.folderLayout = QtGui.QGridLayout(self.foldersScrollAreaWidget)
+        self.folderLayout = QtWidgets.QGridLayout(self.foldersScrollAreaWidget)
         self.folderLayout.setAlignment(QtCore.Qt.AlignTop)
         self.foldersScrollArea.setWidget(self.foldersScrollAreaWidget)
         
-        self.selectWorkDirButton = QtGui.QPushButton("Select work dir")
-        self.connect(self.selectWorkDirButton, QtCore.SIGNAL("clicked()"), self.openWorkDir)
+        self.selectWorkDirButton = QtWidgets.QPushButton("Select work dir")
+        self.selectWorkDirButton.clicked.connect(self.openWorkDir)
 
-        self.mainLayout = QtGui.QVBoxLayout(self)
+        self.mainLayout = QtWidgets.QVBoxLayout(self)
         self.mainLayout.addWidget(self.selectWorkDirButton)
         self.mainLayout.addWidget(self.foldersScrollArea)
         
@@ -42,12 +42,12 @@ class FolderWidget(QtGui.QWidget):
     
     def openWorkDir(self,workdir=None):
         if not(workdir):
-            workdir=QtGui.QFileDialog.getExistingDirectory(directory=self.workDir)
+            workdir=QtWidgets.QFileDialog.getExistingDirectory(directory=self.workDir)
             if workdir != "":
-                self.parent.workDir=unicode(workdir)
+                self.parent.workDir=str(workdir)
         if workdir != "":
-            self.workDir=unicode(workdir)
-            for i in reversed(range(self.folderLayout.count())): 
+            self.workDir=str(workdir)
+            for i in reversed(list(range(self.folderLayout.count()))): 
                 self.folderLayout.itemAt(i).widget().setParent(None)
             self.selectedImage=""
             self.selectedImageDir=""
@@ -61,10 +61,10 @@ class FolderWidget(QtGui.QWidget):
                 imageList= imageQDir.entryList(["*.TIF", "*.tif", "*.jpg", "*.JPG", "*.BMP", "*.bmp"])
                 for name in imageList:
                     if not(name in self.nameList):
-                        self.nameList.append(unicode(name))
+                        self.nameList.append(str(name))
 
 
-            [self.parent.nuclNameComboBox.removeItem(0) for i in xrange(self.parent.nuclNameComboBox.count())]
+            [self.parent.nuclNameComboBox.removeItem(0) for i in range(self.parent.nuclNameComboBox.count())]
             self.parent.nuclNameComboBox.addItems(self.nameList) 
             if self.parent.settings.nuclei_name in self.nameList:
                 #print self.parent.nuclNameComboBox.itemText(1) 
@@ -73,7 +73,7 @@ class FolderWidget(QtGui.QWidget):
                 self.parent.nuclNameComboBox.setCurrentIndex(0)
                 self.parent.settings.nuclei_name=self.nameList[0]
 
-            [self.parent.fociNameComboBox.removeItem(1) for i in xrange(1,self.parent.fociNameComboBox.count())]
+            [self.parent.fociNameComboBox.removeItem(1) for i in range(1,self.parent.fociNameComboBox.count())]
             self.parent.fociNameComboBox.addItems(self.nameList) 
 
             if self.parent.settings.foci_name in self.nameList:
@@ -83,7 +83,7 @@ class FolderWidget(QtGui.QWidget):
                 self.parent.settings.foci_name='--None--'
 
                 
-            self.checkAllBox = QtGui.QCheckBox('Check/Uncheck All', self)
+            self.checkAllBox = QtWidgets.QCheckBox('Check/Uncheck All', self)
             self.checkAllBox.setChecked(True)
             self.checkAllBox.stateChanged.connect(lambda:
                 (self.checkAll() if self.checkAllBox.isChecked()
@@ -103,8 +103,8 @@ class FolderWidget(QtGui.QWidget):
                 nucleiPath=imageQDir.absolutePath() + QtCore.QDir.separator() + self.parent.settings.nuclei_name
                 fociPath=imageQDir.absolutePath() + QtCore.QDir.separator() + self.parent.settings.foci_name
                 if ((self.parent.settings.foci_name == '--None--')&(QtCore.QFile(nucleiPath).exists())):
-                    self.imageDirs.append(pic_an.image_dir(unicode(imageQDir.absolutePath()),
-                                         unicode(self.parent.settings.nuclei_name)))
+                    self.imageDirs.append(pic_an.image_dir(str(imageQDir.absolutePath()),
+                                         str(self.parent.settings.nuclei_name)))
 
                     self.folderWidgets.append(imageFolderWidget(imageQDir))
                     self.folderLayout.addWidget(self.folderWidgets[-1])
@@ -118,9 +118,9 @@ class FolderWidget(QtGui.QWidget):
 
                 elif ((QtCore.QFile(fociPath).exists())&(QtCore.QFile(nucleiPath).exists())):
 
-                    self.imageDirs.append(pic_an.image_dir(unicode(imageQDir.absolutePath()),
-                                         unicode(self.parent.settings.nuclei_name),
-                                         unicode(self.parent.settings.foci_name)))
+                    self.imageDirs.append(pic_an.image_dir(str(imageQDir.absolutePath()),
+                                         str(self.parent.settings.nuclei_name),
+                                         str(self.parent.settings.foci_name)))
                                          
                     self.folderWidgets.append(imageFolderWidget(imageQDir))
                     self.folderLayout.addWidget(self.folderWidgets[-1])
@@ -131,7 +131,7 @@ class FolderWidget(QtGui.QWidget):
                     ############
                     i+=1
 
-            print str(len(self.imageDirs)) + ' dirs found in working directory'
+            print(str(len(self.imageDirs)) + ' dirs found in working directory')
             try:
                 self.updateImages(0)
             except IndexError:
@@ -141,7 +141,7 @@ class FolderWidget(QtGui.QWidget):
         self.cell_set.untouch_cells()
         result = self.imageDirs[self.selectedImageDirKey].touch_cell(coord)
         if result:
-            print "Cell toggled."
+            print("Cell toggled.")
 #            params = self.cell_set.get_parameters_dict()
             self.imageDirs[self.selectedImageDirKey].write_all_pic_files()
             self.updateParamsTable()
@@ -154,7 +154,7 @@ class FolderWidget(QtGui.QWidget):
         name=QtCore.QDir(self.workDir).dirName()
         self.cell_set = pic_an.cell_set(name=name, cells=[])
         tasksize=len(self.getCheckedPaths())
-        print("We have %d images to load for %s" % (tasksize, name))
+        print(("We have %d images to load for %s" % (tasksize, name)))
         self.parent.pbar.show()
         pbarvalue=0
         self.parent.pbar.setValue(pbarvalue)
@@ -163,19 +163,19 @@ class FolderWidget(QtGui.QWidget):
         
         if len(self.folderWidgets) != 0:
             if self.parent.settings.foci_name == '--None--':
-                for i in xrange(0,len(self.folderWidgets)):
+                for i in range(0,len(self.folderWidgets)):
                     if self.folderWidgets[i].checked.checkState() == QtCore.Qt.Checked :
                         self.imageDirs[i].detect_cells(self.parent.settings.sensitivity, 
                                         self.parent.settings.min_cell_size, load_foci=False)
                         self.cell_set.extend(self.imageDirs[i])
                         tasksize -= 1
                         if tasksize == 0:
-                            print("Image loading has finished for %s" % name)
+                            print(("Image loading has finished for %s" % name))
                         else:
-                            print('%d images remained to load for %s' % (tasksize, name))
+                            print(('%d images remained to load for %s' % (tasksize, name)))
                         pbarvalue+=pbarstep
                         self.parent.pbar.setValue(pbarvalue)
-                for i in xrange(0,len(self.folderWidgets)):
+                for i in range(0,len(self.folderWidgets)):
                     if self.folderWidgets[i].checked.checkState() == QtCore.Qt.Checked :
                         self.imageDirs[i].write_all_pic_files(self.parent.settings.nuclei_color,
                                                               self.parent.settings.foci_color)
@@ -189,22 +189,22 @@ class FolderWidget(QtGui.QWidget):
                 self.parent.singleCellOutputBox.setEnabled(True)
 
             else:
-                for i in xrange(0,len(self.folderWidgets)):
+                for i in range(0,len(self.folderWidgets)):
                     if self.folderWidgets[i].checked.checkState() == QtCore.Qt.Checked :
                         self.imageDirs[i].detect_cells(self.parent.settings.sensitivity, 
                                             self.parent.settings.min_cell_size, load_foci=True)
                         self.cell_set.extend(self.imageDirs[i])
                         tasksize -= 1
                         if tasksize == 0:
-                            print("Image loading has finished for %s" % name)
+                            print(("Image loading has finished for %s" % name))
                         else:
-                            print('%d images remained to load for %s' % (tasksize, name))
+                            print(('%d images remained to load for %s' % (tasksize, name)))
                         pbarvalue+=pbarstep
                         self.parent.pbar.setValue(pbarvalue)
                 if len(self.cell_set.cells) == 0:
-                    print("No cells were detected in %s" % name)
+                    print(("No cells were detected in %s" % name))
                     return
-                print("We have %d cells to analyze for %s" % (len(self.cell_set.cells), name))   
+                print(("We have %d cells to analyze for %s" % (len(self.cell_set.cells), name)))   
                 self.cell_set.calculate_foci(self.parent.settings.foci_lookup_sensivity,
                                              self.parent.settings.foci_area_fill_percent,
                                              self.parent.settings.min_foci_radius,
@@ -220,7 +220,7 @@ class FolderWidget(QtGui.QWidget):
                 self.parent.outfileButton.setEnabled(True)
                 self.parent.singleCellOutputBox.setEnabled(True)
                 
-                for i in xrange(0,len(self.folderWidgets)):
+                for i in range(0,len(self.folderWidgets)):
                     if self.folderWidgets[i].checked.checkState() == QtCore.Qt.Checked :
                         self.imageDirs[i].write_all_pic_files(self.parent.settings.nuclei_color,
                                                               self.parent.settings.foci_color)
@@ -229,7 +229,7 @@ class FolderWidget(QtGui.QWidget):
                 self.refreshImages()
                 self.updateAllImageLabels()
                 self.parent.pbar.setValue(100)
-                print("Foci calculation has finished for %s" % name)
+                print(("Foci calculation has finished for %s" % name))
                 
     def updateParamsTable(self):
         params = self.cell_set.get_parameters_dict(verbose = self.parent.singleCellOutputBox.isChecked())
@@ -244,7 +244,7 @@ class FolderWidget(QtGui.QWidget):
         self.parent.pbar.setValue(pbarvalue)
         pbarstep = (100 - 10 )/ tasksize
         if len(self.folderWidgets) != 0:
-            for i in xrange(0,len(self.folderWidgets)):
+            for i in range(0,len(self.folderWidgets)):
                 if self.folderWidgets[i].checked.checkState() == QtCore.Qt.Checked :
                     self.imageDirs[i].detect_cells(self.parent.settings.sensitivity, 
                                         self.parent.settings.min_cell_size, load_foci=True)
@@ -253,15 +253,15 @@ class FolderWidget(QtGui.QWidget):
                     self.parent.pbar.setValue(pbarvalue)
             (self.parent.settings.foci_rescale_min,
              self.parent.settings.foci_rescale_max) = self.cell_set.get_foci_rescale_values()
-            print 'Foci rescale values changed to:\nmin: ' + str(self.parent.settings.foci_rescale_min) \
-                                                + '\nmax: '+ str(self.parent.settings.foci_rescale_max)
+            print('Foci rescale values changed to:\nmin: ' + str(self.parent.settings.foci_rescale_min) \
+                                                + '\nmax: '+ str(self.parent.settings.foci_rescale_max))
             self.parent.pbar.setValue(100)
              
     def changeFociImages(self):
-        for i in xrange(0,len(self.folderWidgets)):
+        for i in range(0,len(self.folderWidgets)):
             fociPath=self.folderWidgets[i].dir.absolutePath() + QtCore.QDir.separator() + self.parent.settings.foci_name
             if QtCore.QFile(fociPath).exists():                
-                self.imageDirs[i].load_foci_image(unicode(fociPath))
+                self.imageDirs[i].load_foci_image(str(fociPath))
             else:
                 self.openWorkDir(self.parent.workDir)
                 break
@@ -269,32 +269,32 @@ class FolderWidget(QtGui.QWidget):
                 
     def hideAllImageLabels(self):   
             
-        for i in xrange(0,len(self.folderWidgets)):
+        for i in range(0,len(self.folderWidgets)):
             self.folderWidgets[i].hideAllImageLabels()
             
     def updateAllImageLabels(self):   
             
-        for i in xrange(0,len(self.folderWidgets)):
+        for i in range(0,len(self.folderWidgets)):
             self.folderWidgets[i].updateImageLabels()
             
     def checkAll(self):
-        for i in xrange(0,len(self.folderWidgets)):
+        for i in range(0,len(self.folderWidgets)):
             self.folderWidgets[i].checked.setChecked(True)
         
     def unCheckAll(self):
-        for i in xrange(0,len(self.folderWidgets)):
+        for i in range(0,len(self.folderWidgets)):
             self.folderWidgets[i].checked.setChecked(False)
 
     def getCheckedPaths(self):
         paths=[]
         try:
-            for i in xrange(0,len(self.folderWidgets)):
+            for i in range(0,len(self.folderWidgets)):
                 if self.folderWidgets[i].checked.checkState() == QtCore.Qt.Checked :
-                    paths.append(unicode(self.folderWidgets[i].dir.absolutePath()))
+                    paths.append(str(self.folderWidgets[i].dir.absolutePath()))
         except AttributeError:
             ()
         #####
-        print "No selected folders" if len(paths) == 0 else str(len(paths))+" folders selected"
+        print("No selected folders" if len(paths) == 0 else str(len(paths))+" folders selected")
         #####
         return paths
     
@@ -323,8 +323,8 @@ class FolderWidget(QtGui.QWidget):
     
     def setCheckedFromPaths(self,paths):
         try:
-            for i in xrange(0,len(self.folderWidgets)):
-                if unicode(self.folderWidgets[i].dir.absolutePath()) in paths:
+            for i in range(0,len(self.folderWidgets)):
+                if str(self.folderWidgets[i].dir.absolutePath()) in paths:
                     self.folderWidgets[i].checked.setChecked(True)
                 else:
                     self.folderWidgets[i].checked.setChecked(False)
@@ -334,7 +334,7 @@ class FolderWidget(QtGui.QWidget):
 
             
             
-class imageFolderWidget(QtGui.QWidget):
+class imageFolderWidget(QtWidgets.QWidget):
 
     def __init__(self,inDir):
         super(imageFolderWidget, self).__init__()
@@ -343,20 +343,20 @@ class imageFolderWidget(QtGui.QWidget):
         self.dir=inDir
         self.selectedPic=""
         
-        self.Layout = QtGui.QGridLayout(self)
+        self.Layout = QtWidgets.QGridLayout(self)
         self.Layout.setSpacing(0)
         self.Layout.setContentsMargins(0,0,0,0)
         self.Layout.setAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         
-        self.checked = QtGui.QCheckBox(self)
+        self.checked = QtWidgets.QCheckBox(self)
         self.checked.setTristate(False)
         self.checked.setChecked(True)
         
-        self.r_button = QtGui.QPushButton(self.dir.dirName())
-        self.r_button.setIcon(self.style().standardIcon(QtGui.QStyle.SP_DirIcon))
-        self.r_button.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.r_button = QtWidgets.QPushButton(self.dir.dirName())
+        self.r_button.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_DirIcon))
+        self.r_button.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.r_button.setStyleSheet("text-align: left;padding: 3px")
-        self.connect(self.r_button, QtCore.SIGNAL("clicked()"), self.showAllImageLabels)
+        self.r_button.clicked.connect(self.showAllImageLabels)
         
         self.Layout.addWidget(self.checked,0,0)
         self.Layout.addWidget(self.r_button,0,1)
@@ -377,9 +377,8 @@ class imageFolderWidget(QtGui.QWidget):
                 self.i+=1
                 self.dirs.append(tempDir)
                 
-                self.labels.append(ExtendedQLabel(unicode(self.dirs[-1].dirName())))
-                self.connect(self.labels[-1], QtCore.SIGNAL("clicked()"),
-                             lambda key=self.i-2: self.selectPicture(key))
+                self.labels.append(ExtendedQLabel(str(self.dirs[-1].dirName())))
+                self.labels[-1].clicked.connect(lambda key=self.i-2: self.selectPicture(key))
                 self.Layout.addWidget(self.labels[-1],self.i,1)
                 self.labels[-1].setAutoFillBackground(True)
                 self.labels[-1].setStyleSheet( "background-color: none; qproperty-alignment: AlignCenter;")
@@ -391,7 +390,7 @@ class imageFolderWidget(QtGui.QWidget):
     signal_show_all_images = QtCore.pyqtSignal()        
     
     def hideAllImageLabels(self):
-        for i in xrange(0,len(self.labels)):
+        for i in range(0,len(self.labels)):
             self.labels[i].hide()
             self.labels[i].setStyleSheet( "background-color: none; qproperty-alignment: AlignCenter;");
             self.isHidden=True
@@ -402,28 +401,30 @@ class imageFolderWidget(QtGui.QWidget):
         self.selectedPic=None
         self.signal_show_all_images.emit()
         if oldhide:
-            for i in xrange(0,len(self.labels)):
+            for i in range(0,len(self.labels)):
                 self.labels[i].show()
             self.isHidden=False
         else:
             self.isHidden=True
     
     def selectPicture(self,item):
-        for i in xrange(0,len(self.labels)):
+        for i in range(0,len(self.labels)):
             self.labels[i].setStyleSheet( "background-color: none; qproperty-alignment: AlignCenter;");
         self.labels[item].setStyleSheet( "background-color: palette(highlight); qproperty-alignment: AlignCenter;");
-        self.selectedPic=unicode(self.dirs[item].absolutePath())
+        self.selectedPic=str(self.dirs[item].absolutePath())
         self.signal_show_all_images.emit()
         
 
         
                 
             
-class ExtendedQLabel(QtGui.QLabel):
+class ExtendedQLabel(QtWidgets.QLabel):
  
     def __init(self, parent):
-        QtGui.QLabel.__init__(self, parent)
+        super().__init__(self, parent)
  
+    clicked = QtCore.pyqtSignal()
+
     def mouseReleaseEvent(self, ev):
         self.emit(QtCore.SIGNAL('clicked()'))
  
@@ -432,8 +433,8 @@ class ExtendedQLabel(QtGui.QLabel):
 
 def main():
     
-    app = QtGui.QApplication(sys.argv)
-    workDir=unicode(QtCore.QDir.currentPath())
+    app = QtWidgets.QApplication(sys.argv)
+    workDir=str(QtCore.QDir.currentPath())
     ex = FolderWidget(workDir)
     ex.show()
     sys.exit(app.exec_())

@@ -37,14 +37,14 @@ class setting:
 
         if type(val) != self.stype:
 
-            print 'Value type is wrong; setting ' +  self.info_str + ' to default'
+            print('Value type is wrong; setting ' +  self.info_str + ' to default')
             self.set_default()
             return False
 
         if self.stype == float or self.stype == int:
             if val > self.max_val or val < self.min_val:
 
-                print 'Setting value is wrong; setting ' +  self.info_str + ' to default'
+                print('Setting value is wrong; setting ' +  self.info_str + ' to default')
                 self.set_default()
                 return False
 
